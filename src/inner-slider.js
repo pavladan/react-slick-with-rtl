@@ -447,7 +447,7 @@ export class InnerSlider extends React.Component {
     this.clickable = true;
   };
   keyHandler = e => {
-    let dir = keyHandler(e, this.props.accessibility, this.props.rtl);
+    let dir = keyHandler(e, this.props.accessibility);
     dir !== "" && this.changeSlide({ message: dir });
   };
   selectHandler = options => {
@@ -540,14 +540,10 @@ export class InnerSlider extends React.Component {
   };
   play = () => {
     var nextIndex;
-    if (this.props.rtl) {
-      nextIndex = this.state.currentSlide - this.props.slidesToScroll;
+    if (canGoNext({ ...this.props, ...this.state })) {
+      nextIndex = this.state.currentSlide + this.props.slidesToScroll;
     } else {
-      if (canGoNext({ ...this.props, ...this.state })) {
-        nextIndex = this.state.currentSlide + this.props.slidesToScroll;
-      } else {
-        return false;
-      }
+      return false;
     }
 
     this.slideHandler(nextIndex);
@@ -684,6 +680,7 @@ export class InnerSlider extends React.Component {
 
     var prevArrow, nextArrow;
     let arrowProps = extractObject(spec, [
+      "rtl",
       "infinite",
       "centerMode",
       "currentSlide",
@@ -739,11 +736,15 @@ export class InnerSlider extends React.Component {
       onTouchCancel: this.state.dragging && touchMove ? this.swipeEnd : null,
       onKeyDown: this.props.accessibility ? this.keyHandler : null
     };
+    let direction = "ltr";
+    if (this.props.rtl == true) {
+      direction = "rtl";
+    }
 
     let innerSliderProps = {
       className: className,
-      dir: "ltr",
-      style: this.props.style
+      style: { ...this.props.style },
+      dir: direction
     };
 
     if (this.props.unslick) {

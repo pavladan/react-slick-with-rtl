@@ -13,11 +13,8 @@ const getSlideClasses = spec => {
   let slickActive, slickCenter, slickCloned;
   let centerOffset, index;
 
-  if (spec.rtl) {
-    index = spec.slideCount - 1 - spec.index;
-  } else {
-    index = spec.index;
-  }
+  index = spec.index;
+
   slickCloned = index < 0 || index >= spec.slideCount;
   if (spec.centerMode) {
     centerOffset = Math.floor(spec.slidesToShow / 2);
@@ -189,12 +186,7 @@ const renderSlides = spec => {
       }
     }
   });
-
-  if (spec.rtl) {
-    return preCloneSlides.concat(slides, postCloneSlides).reverse();
-  } else {
-    return preCloneSlides.concat(slides, postCloneSlides);
-  }
+  return preCloneSlides.concat(slides, postCloneSlides);
 };
 
 export class Track extends React.PureComponent {

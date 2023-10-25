@@ -1,4 +1,8 @@
-### react-slick
+### react-slick-with-rtl
+
+The aim of this package is to fix React-slick's RTL bug that has been reported since 2018 but no one has successfully fixed it.
+
+This package is originally designed base on Akiran's [react-slick](https://github.com/akiran/react-slick)
 
 [![Backers on Open Collective](https://opencollective.com/react-slick/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/react-slick/sponsors/badge.svg)](#sponsors)
 
@@ -11,13 +15,13 @@
 **npm**
 
 ```bash
-npm install react-slick --save
+npm install react-slick-with-rtl --save
 ```
 
 **yarn**
 
 ```bash
-yarn add react-slick
+yarn add react-slick-with-rtl
 ```
 
 **Also install slick-carousel for css and font**
@@ -52,7 +56,7 @@ or add cdn link in your html
 
 ```js
 import React from "react";
-import Slider from "react-slick";
+import Slider from "react-slick-with-rtl";
 
 export default function SimpleSlider() {
   var settings = {
@@ -100,8 +104,8 @@ For all available methods, go [here](https://react-slick.neostack.com/docs/api#m
 Want to run demos locally
 
 ```bash
-git clone https://github.com/akiran/react-slick
-cd react-slick
+git clone https://github.com/pavladan/react-slick-with-rtl
+cd react-slick-with-rtl
 npm install
 npm start
 open http://localhost:8080
@@ -110,7 +114,6 @@ open http://localhost:8080
 ## Community
 
 Join our [discord channel](https://discord.gg/z7stRE4Cyb) to discuss react-slick bugs and ask for help
-
 
 ## Contributing
 

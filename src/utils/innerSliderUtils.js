@@ -6,10 +6,10 @@ export function clamp(number, lowerBound, upperBound) {
 
 export const safePreventDefault = event => {
   const passiveEvents = ["onTouchStart", "onTouchMove", "onWheel"];
-  if(!passiveEvents.includes(event._reactName)) {
+  if (!passiveEvents.includes(event._reactName)) {
     event.preventDefault();
   }
-}
+};
 
 export const getOnDemandLazySlides = spec => {
   let onDemandSlides = [];
@@ -53,7 +53,11 @@ export const lazySlidesOnRight = spec =>
 // get width of an element
 export const getWidth = elem => (elem && elem.offsetWidth) || 0;
 export const getHeight = elem => (elem && elem.offsetHeight) || 0;
-export const getSwipeDirection = (touchObject, verticalSwiping = false) => {
+export const getSwipeDirection = (
+  touchObject,
+  verticalSwiping = false,
+  rtl
+) => {
   var xDist, yDist, r, swipeAngle;
   xDist = touchObject.startX - touchObject.curX;
   yDist = touchObject.startY - touchObject.curY;
@@ -66,10 +70,10 @@ export const getSwipeDirection = (touchObject, verticalSwiping = false) => {
     (swipeAngle <= 45 && swipeAngle >= 0) ||
     (swipeAngle <= 360 && swipeAngle >= 315)
   ) {
-    return "left";
+    return rtl === true ? "right" : "left";
   }
   if (swipeAngle >= 135 && swipeAngle <= 225) {
-    return "right";
+    return rtl === true ? "left" : "right";
   }
   if (verticalSwiping === true) {
     if (swipeAngle >= 35 && swipeAngle <= 135) {
@@ -131,9 +135,7 @@ export const initializedState = spec => {
   let listHeight = slideHeight * spec.slidesToShow;
   let currentSlide =
     spec.currentSlide === undefined ? spec.initialSlide : spec.currentSlide;
-  if (spec.rtl && spec.currentSlide === undefined) {
-    currentSlide = slideCount - 1 - spec.initialSlide;
-  }
+
   let lazyLoadedList = spec.lazyLoadedList || [];
   let slidesToLoad = getOnDemandLazySlides({
     ...spec,
@@ -314,11 +316,11 @@ export const changeSlide = (spec, options) => {
   }
   return targetSlide;
 };
-export const keyHandler = (e, accessibility, rtl) => {
+export const keyHandler = (e, accessibility) => {
   if (e.target.tagName.match("TEXTAREA|INPUT|SELECT") || !accessibility)
     return "";
-  if (e.keyCode === 37) return rtl ? "next" : "previous";
-  if (e.keyCode === 39) return rtl ? "previous" : "next";
+  if (e.keyCode === 37) "previous";
+  if (e.keyCode === 39) "next";
   return "";
 };
 
@@ -376,19 +378,25 @@ export const swipeMove = (e, spec) => {
     return { scrolling: true };
   }
   if (verticalSwiping) touchObject.swipeLength = verticalSwipeLength;
-  let positionOffset =
-    (!rtl ? 1 : -1) * (touchObject.curX > touchObject.startX ? 1 : -1);
+  let positionOffset = touchObject.curX > touchObject.startX ? 1 : -1;
   if (verticalSwiping)
     positionOffset = touchObject.curY > touchObject.startY ? 1 : -1;
 
   let dotCount = Math.ceil(slideCount / slidesToScroll);
-  let swipeDirection = getSwipeDirection(spec.touchObject, verticalSwiping);
+  let swipeDirection = getSwipeDirection(
+    spec.touchObject,
+    verticalSwiping,
+    rtl
+  );
   let touchSwipeLength = touchObject.swipeLength;
   if (!infinite) {
     if (
-      (currentSlide === 0 && (swipeDirection === "right" || swipeDirection === "down")) ||
-      (currentSlide + 1 >= dotCount && (swipeDirection === "left" || swipeDirection === "up")) ||
-      (!canGoNext(spec) && (swipeDirection === "left" || swipeDirection === "up"))
+      (currentSlide === 0 &&
+        (swipeDirection === "right" || swipeDirection === "down")) ||
+      (currentSlide + 1 >= dotCount &&
+        (swipeDirection === "left" || swipeDirection === "up")) ||
+      (!canGoNext(spec) &&
+        (swipeDirection === "left" || swipeDirection === "up"))
     ) {
       touchSwipeLength = touchObject.swipeLength * edgeFriction;
       if (edgeDragged === false && onEdge) {
@@ -455,7 +463,11 @@ export const swipeEnd = (e, spec) => {
   let minSwipe = verticalSwiping
     ? listHeight / touchThreshold
     : listWidth / touchThreshold;
-  let swipeDirection = getSwipeDirection(touchObject, verticalSwiping);
+  let swipeDirection = getSwipeDirection(
+    touchObject,
+    verticalSwiping,
+    spec.rtl
+  );
   // reset the state of touch related state variables.
   let state = {
     dragging: false,
@@ -564,10 +576,7 @@ export const getSlideCount = spec => {
     if (!swipedSlide) {
       return 0;
     }
-    const currentIndex =
-      spec.rtl === true
-        ? spec.slideCount - spec.currentSlide
-        : spec.currentSlide;
+    const currentIndex = spec.currentSlide;
     const slidesTraversed =
       Math.abs(swipedSlide.dataset.index - currentIndex) || 1;
     return slidesTraversed;
@@ -587,7 +596,8 @@ export const getTrackCSS = spec => {
     "variableWidth",
     "slideCount",
     "slidesToShow",
-    "slideWidth"
+    "slideWidth",
+    "rtl"
   ]);
   let trackWidth, trackHeight;
   const trackChildren = spec.slideCount + 2 * spec.slidesToShow;
@@ -602,15 +612,19 @@ export const getTrackCSS = spec => {
     WebkitTransition: ""
   };
   if (spec.useTransform) {
+    let specLeft = spec.left;
+    if (spec.rtl === true) {
+      specLeft = -specLeft;
+    }
     let WebkitTransform = !spec.vertical
-      ? "translate3d(" + spec.left + "px, 0px, 0px)"
-      : "translate3d(0px, " + spec.left + "px, 0px)";
+      ? "translate3d(" + specLeft + "px, 0px, 0px)"
+      : "translate3d(0px, " + specLeft + "px, 0px)";
     let transform = !spec.vertical
-      ? "translate3d(" + spec.left + "px, 0px, 0px)"
-      : "translate3d(0px, " + spec.left + "px, 0px)";
+      ? "translate3d(" + specLeft + "px, 0px, 0px)"
+      : "translate3d(0px, " + specLeft + "px, 0px)";
     let msTransform = !spec.vertical
-      ? "translateX(" + spec.left + "px)"
-      : "translateY(" + spec.left + "px)";
+      ? "translateX(" + specLeft + "px)"
+      : "translateY(" + specLeft + "px)";
     style = {
       ...style,
       WebkitTransform,
